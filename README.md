@@ -9,6 +9,10 @@
 
 一个偏向 **稳定、易维护、低折腾** 的 Mihomo（Clash Meta）分流配置文件。
 
+<p align="center">
+  <img src="./配置效果.png" alt="配置运行效果预览" width="85%">
+</p>
+
 ---
 
 ## ✨ 配置特点
@@ -36,6 +40,16 @@
 * 🧠 **LLMs:** ChatGPT / Claude / Grok / Perplexity
 * 🎨 **Creatives:** Midjourney
 * 🛠️ **Dev Tools:** OpenRouter / Devv
+
+<br>
+
+<details>
+<summary>📊 <b>点击展开查看路由规则与策略分流效果图</b></summary>
+<br>
+<p align="center">
+  <img src="./分流效果.png" alt="分流匹配路由效果预览" width="85%">
+</p>
+</details>
 
 ---
 
@@ -104,6 +118,4 @@ proxy-providers:
 ## 📜 License
 
 仅供学习与交流使用。
-
-
 
