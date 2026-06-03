@@ -396,11 +396,11 @@ rules:
   - AND,((NETWORK,udp),(GEOSITE,google)),REJECT-DROP # ✅ 拦截谷歌的 UDP (QUIC) 流量，强制走 TCP 代理更稳定
 
   - GEOSITE,google,Google全家桶 # 这一行直接全包所有谷歌旗下子域名
-  - GEOIP,google,Google全家桶 # IP 兜底
+  - GEOIP,google,Google全家桶,no-resolve # IP 兜底
 
   # ==================== 国内外兜底 ====================
   - GEOSITE,CN,国内
-  - GEOIP,CN,国内
+  - GEOIP,CN,国内,no-resolve
 
   - GEOSITE,geolocation-!cn,其他
 
