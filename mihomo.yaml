@@ -39,7 +39,7 @@ mixed-port: 7890
 ipv6: false
 allow-lan: true
 unified-delay: true
-tcp-concurrent: false
+tcp-concurrent: true
 
 #keep-alive-interval: 60
 #keep-alive-idle: 300
