@@ -10,12 +10,14 @@ pr:
 # 2. 统一订阅源的高级健康检查参数
 p: &p
   type: http
+  interval: 86400
   health-check:
     enable: true
     lazy: true
     url: "https://www.gstatic.com/generate_204"
-    interval: 7200
+    interval: 10800
     timeout: 3000
+    concurrency: 5
 
 # 3. 自动化策略组基准模板（纯测速）
 ut:
@@ -35,30 +37,30 @@ fhk: &fhk "(?i)(港|香港|hk|hongkong|hong kong)"
 ftw: &ftw "(?i)(台|tw|taiwan)"
 fjp: &fjp "(?i)(日|jp|japan)"
 fkr: &fkr "(?i)(韩|韩国|首尔|kr|korea|south korea)"
-fsg: &fsg "(?i)(新|sg|singapore)"
+fsg: &fsg "(?i)(新加坡|sg|singapore)"
 fus: &fus "(?i)(美|us|usa|unitedstates|united states|america|los angeles|silicon valley)"
-fot: &fot "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇰🇷|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|韩|kr|korea|新|sg|singapore|美|us|unitedstates|官网|重置|到期|剩余|流量|机场|客服|套餐|订阅|版本)).*"
+fot: &fot "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇰🇷|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|韩|kr|korea|新加坡|sg|singapore|美|us|unitedstates|官网|重置|到期|剩余|流量|机场|客服|套餐|订阅|版本)).*"
 flw: &flw '(?i)^(?!.*(剩|期|流量|已用|节|官|客)).*(0\.[0-9]+(x|倍率|倍)?|低倍)'
 ######### 🚀 锚点定义区域 end #######
 
 proxy-providers:
-  Pr1:
+  P1:
     <<: *p
-    url: "填入订阅地址"
+    url: "填入你的订阅链接"
     override:
-      additional-prefix: "[Pr1]"
+      additional-prefix: "[P1]"
 
-  Pr2:
+  P2:
     <<: *p
-    url: ""
+    url: "填入你的订阅链接"
     override:
-      additional-prefix: "[Pr2]"
+      additional-prefix: "[P2]"
 
-  Pr3:
+  P3:
     <<: *p
-    url: ""
+    url: "填入你的订阅链接"
     override:
-      additional-prefix: "[Pr3]"
+      additional-prefix: "[P3]"
 
 proxies: []
 
@@ -67,12 +69,15 @@ ipv6: false
 allow-lan: true
 unified-delay: true
 tcp-concurrent: true
+find-process-mode: strict
 
 # ==================== 📱 手机端移动网络秒切优化 ====================
 reset-network-change: true # 当 Wi-Fi 和流量切换时，瞬间重置网络栈，斩断死连接
 auto-detect-interface: true # 允许自动检测并适应手机当前活跃的网卡接口
-udp-timeout: 15 # 缩短 UDP 超时，强制残留的旧连接快速死掉，逼迫手机走新网络
-# ====================================================================
+udp-timeout: 30 # 缩短 UDP 超时，强制残留的旧连接快速死掉，逼迫手机走新网络
+tcp-keep-alive-idle: 600
+keep-alive-interval: 60
+# ==============================================================
 
 external-controller: 127.0.0.1:9090
 
@@ -80,11 +85,134 @@ external-controller: 127.0.0.1:9090
 external-ui: ./ui
 external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
 
-geox-url:
-  geoip: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat"
-  geosite: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
-  mmdb: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb"
-  asn: "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb"
+# ==================== 🛠️ Rule Providers ====================
+rule-providers:
+  private:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs",
+      path: "./ruleset/private.mrs",
+    }
+  ai:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.mrs",
+      path: "./ruleset/ai.mrs",
+    }
+  google:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs",
+      path: "./ruleset/google.mrs",
+    }
+  google_ip:
+    {
+      type: http,
+      interval: 86400,
+      behavior: ipcidr,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs",
+      path: "./ruleset/google_ip.mrs",
+    }
+  youtube:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/youtube.mrs",
+      path: "./ruleset/youtube.mrs",
+    }
+  tiktok:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs",
+      path: "./ruleset/tiktok.mrs",
+    }
+  bilibili:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bilibili.mrs",
+      path: "./ruleset/bilibili.mrs",
+    }
+  bahamut:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bahamut.mrs",
+      path: "./ruleset/bahamut.mrs",
+    }
+  netflix:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs",
+      path: "./ruleset/netflix.mrs",
+    }
+  spotify:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/spotify.mrs",
+      path: "./ruleset/spotify.mrs",
+    }
+  github:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs",
+      path: "./ruleset/github.mrs",
+    }
+  gfw:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs",
+      path: "./ruleset/gfw.mrs",
+    }
+  cn:
+    {
+      type: http,
+      interval: 86400,
+      behavior: domain,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs",
+      path: "./ruleset/cn.mrs",
+    }
+  cn_ip:
+    {
+      type: http,
+      interval: 86400,
+      behavior: ipcidr,
+      format: mrs,
+      url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs",
+      path: "./ruleset/cn_ip.mrs",
+    }
 
 profile:
   store-selected: true
@@ -132,7 +260,7 @@ dns:
     - "+.lan"
     - "+.local"
     - "+.market.xiaomi.com"
-    - "geosite:private" # 🟢 纯 Geodata 语法
+    - "rule-set:private" # 🟢 修正为规则集语法
 
   default-nameserver:
     - "223.5.5.5"
@@ -143,10 +271,13 @@ dns:
     - "https://doh.pub/dns-query"
 
   nameserver:
-    - "https://dns.alidns.com/dns-query"
-    - "https://doh.pub/dns-query"
-    - "https://dns.cloudflare.com/dns-query" # 👈 新增：防污染国外兜底
-    - "https://dns.google/dns-query" # 👈 新增：防污染国外兜底
+    - "https://dns.cloudflare.com/dns-query#默认"
+    - "https://dns.google/dns-query#默认"
+
+  nameserver-policy:
+    "rule-set:cn":
+      - "https://dns.alidns.com/dns-query"
+      - "https://doh.pub/dns-query"
 
 hosts:
   "dns.alidns.com": ["223.5.5.5", "223.6.6.6"]
@@ -159,14 +290,14 @@ hosts:
 
 proxy-groups:
   # ==================== 后台测速组 ====================
-  - { name: "香港-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fhk }
-  - { name: "台湾-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *ftw }
-  - { name: "日本-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fjp }
-  - { name: "韩国-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fkr }
-  - { name: "新加坡-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fsg }
-  - { name: "美国-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fus }
-  - { name: "其它地区-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *fot }
-  - { name: "低倍率-自动选择", <<: *ut, use: [Pr1, Pr2, Pr3], filter: *flw }
+  - { name: "香港-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fhk }
+  - { name: "台湾-自动选择", <<: *ut, use: [P1, P2, P3], filter: *ftw }
+  - { name: "日本-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fjp }
+  - { name: "韩国-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fkr }
+  - { name: "新加坡-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fsg }
+  - { name: "美国-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fus }
+  - { name: "其它地区-自动选择", <<: *ut, use: [P1, P2, P3], filter: *fot }
+  - { name: "低倍率-自动选择", <<: *ut, use: [P1, P2, P3], filter: *flw }
 
   # ==================== 核心组 ====================
   - name: 默认
@@ -227,11 +358,6 @@ proxy-groups:
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/GitHub.png",
     }
   - {
-      name: 国内,
-      <<: *pr,
-      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png",
-    }
-  - {
       name: 其他,
       <<: *pr,
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png",
@@ -241,7 +367,7 @@ proxy-groups:
   - {
       name: 香港,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fhk,
       proxies: ["香港-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png",
@@ -249,7 +375,7 @@ proxy-groups:
   - {
       name: 台湾,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *ftw,
       proxies: ["台湾-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png",
@@ -257,7 +383,7 @@ proxy-groups:
   - {
       name: 日本,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fjp,
       proxies: ["日本-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png",
@@ -265,7 +391,7 @@ proxy-groups:
   - {
       name: 韩国,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fkr,
       proxies: ["韩国-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png",
@@ -273,7 +399,7 @@ proxy-groups:
   - {
       name: 新加坡,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fsg,
       proxies: ["新加坡-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png",
@@ -281,7 +407,7 @@ proxy-groups:
   - {
       name: 美国,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fus,
       proxies: ["美国-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png",
@@ -289,7 +415,7 @@ proxy-groups:
   - {
       name: 其它地区,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *fot,
       proxies: ["其它地区-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png",
@@ -297,51 +423,49 @@ proxy-groups:
   - {
       name: 低倍率节点,
       type: select,
-      use: [Pr1, Pr2, Pr3],
+      use: [P1, P2, P3],
       filter: *flw,
       proxies: ["低倍率-自动选择"],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Available_1.png",
     }
 
+# --- 精简优化的路由规则 ---
 rules:
-  # ==================== 局域网（最优先） ====================
-  - GEOSITE,private,直连
-  - GEOIP,private,直连,no-resolve
+  # ==================== 🔒 私有网络与局域网直连 ====================
+  - RULE-SET,private,直连
+  - DOMAIN,fsend.cn,直连 # 手动直连域名提升至最顶层，确保万无一失
 
-  # ==================== AI（置顶拦截，绝不漏包） ====================
-  - GEOSITE,openai,人工智能
-  - GEOSITE,anthropic,人工智能
-  - GEOSITE,xai,人工智能
-  - GEOSITE,perplexity,人工智能
-
-  - DOMAIN-SUFFIX,midjourney.com,人工智能
-  - DOMAIN-SUFFIX,midjourney.io,人工智能
-  - DOMAIN-KEYWORD,midjourney,人工智能
-
+  # ==================== 📝 手动附加域名分流 ====================
+  # 手动精确规则移至大规则集上方，防止被覆盖，且方便以后随时调整策略组
   - DOMAIN-SUFFIX,openrouter.ai,人工智能
   - DOMAIN-SUFFIX,devv.ai,人工智能
   - DOMAIN-SUFFIX,claude.ai,人工智能
-  # ==================== TikTok ====================
-  - GEOSITE,tiktok,TikTok
 
-  # ==================== 分组服务 ====================
-  - GEOSITE,youtube,YouTube
-  - GEOSITE,github,Github
-  - GEOSITE,netflix,NETFLIX
-  - GEOSITE,bahamut,巴哈姆特
-  - GEOSITE,bilibili,哔哩哔哩
-  - GEOSITE,spotify,Spotify
+  # ==================== 🚫 阻断 Google UDP/QUIC 流量 ====================
+  # 标准的 Mihomo (Clash Meta) 逻辑组合语法，完美阻断 QUIC 迫使降级 TCP
+  - AND,((NETWORK,udp),(DST-PORT,443),(RULE-SET,google)),REJECT-DROP
 
-  # ==================== Google ====================
-  - AND,((NETWORK,udp),(GEOSITE,google)),REJECT-DROP
+  # ==================== 🤖 核心代理规则（域名规则集） ====================
+  - RULE-SET,youtube,YouTube
+  - RULE-SET,google,Google全家桶
+  - RULE-SET,ai,人工智能
+  - RULE-SET,tiktok,TikTok
+  - RULE-SET,bahamut,巴哈姆特
+  - RULE-SET,bilibili,哔哩哔哩
+  - RULE-SET,netflix,NETFLIX
+  - RULE-SET,spotify,Spotify
+  - RULE-SET,github,Github
 
-  - GEOSITE,google,Google全家桶
-  - GEOIP,google,Google全家桶,no-resolve
+  # ==================== 🌐 精准海外 IP 拦截防御 ====================
+  # 🟢 必须带 no-resolve：如果是未知域名流量直接跳过，防止本地 DNS 解析被墙污染或卡顿
+  - RULE-SET,google_ip,Google全家桶,no-resolve
 
-  # ==================== 国内外兜底 ====================
-  - GEOSITE,CN,国内
-  - GEOIP,CN,国内,no-resolve
+  # ==================== 🛡️ 墙内安全防线与终极兜底 ====================
+  - RULE-SET,gfw,默认 # 明确在墙外的冷门网站，优先送去代理
+  - RULE-SET,cn,直连 # 常见国内域名，直接放行直连
 
-  - GEOSITE,geolocation-!cn,其他
+  # 🟢 坚决不带 no-resolve：漏网的国内冷门域名走到这里，触发本地 DNS 解析
+  # 如果解析出是国内 IP 就直连；如果不是，就漏给下一行的 MATCH 走代理
+  - RULE-SET,cn_ip,直连
 
-  - MATCH,其他
+  - MATCH,其他 # 剩下的所有绝对未知流量，完美进入代理兜底
