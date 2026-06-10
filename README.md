@@ -82,17 +82,17 @@
 
 ```yaml
 proxy-providers:
-  𝗟𝗫:
+  P1:
     <<: *p
-    url: "[https://liangxin.xyz/api/v1/](https://liangxin.xyz/api/v1/)..." # 良信订阅
+    url: "填入订阅"     # 订阅1
     override:
-      additional-prefix: "[𝗟𝗫]"
+      additional-prefix: "[P1]"
 
-  𝗩𝗩:
+  P2:
     <<: *p
-    url: "[https://wyun.yvvy.xyz/s/](https://wyun.yvvy.xyz/s/)..."     # VV 订阅
+    url: "填入订阅"     # 订阅2
     override:
-      additional-prefix: "[𝗩𝗩]"
+      additional-prefix: "[P2]"
 
 ```
 
