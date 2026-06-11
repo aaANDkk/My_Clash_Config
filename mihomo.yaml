@@ -1,6 +1,6 @@
 ######### 🚀 锚点定义区域 start #######
 # 1. 统一所有功能分流组的可选节点队列
-pr: &pr {type: select, proxies: [默认, 直连, 香港, 台湾, 日本, 韩国, 新加坡, 美国, 其他地区, 解锁节点]}
+pr: &pr {type: select, proxies: [默认, 解锁节点, 直连, 香港, 台湾, 日本, 韩国, 新加坡, 美国, 其他地区]}
 
 # 2. 统一订阅源的高级健康检查参数
 p: &p
@@ -30,8 +30,8 @@ fjp: &fjp '🇯🇵|日本|JP|[Jj]apan'
 fkr: &fkr '🇰🇷|韩|韩国|首尔|KR|[Kk]orea'
 fsg: &fsg '🇸🇬|新加坡|狮城|SG|[Ss]ingapore'
 fus: &fus '🇺🇸|美|US|[Aa]merica|[Uu]nited\s*[Ss]tates'
-fot: &fot "(?i)^(?!.*(?:🇭🇰|🇹🇼|🇯🇵|🇺🇸|🇸🇬|🇰🇷|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|韩|kr|korea|新加坡|sg|singapore|美|us|unitedstates|官网|重置|到期|剩余|流量|机场|客服|套餐|订阅|版本)).*"
-fjs: &fjs '(?i)解锁|流媒体|媒体|解|原生|家庭|家宽|(?<![a-zA-Z])ai(?![a-zA-Z])|gpt|openai|claude|netflix|nf|hulu|disney|hbo|play'
+fot: &fot '(?i)^(?!.*(🇭🇰|🇹🇼|🇯🇵|🇺🇸|🇸🇬|🇰🇷|🇨🇳|港|hk|hong\s*kong|台|tw|taiwan|日|jp|japan|韩|kr|korea|新加坡|sg|singapore|美|us|united\s*states|官网|重置|到期|剩余|流量|机场|客服|套餐|订阅|版本)).+$'
+fjs: &fjs '(?i)解锁|解|原生|家庭|家宽|住宅|(?<![a-zA-Z])ai(?![a-zA-Z])|gpt|openai|claude|netflix|nf|hulu|disney|hbo|ISP|HINET|HKT|play'
 
 ######### 🚀 锚点定义区域 end #######
 
@@ -67,34 +67,24 @@ external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-
 
 # ==================== 🛠️ Rule Providers ====================
 rule-providers:  
-  # --- 私有与局域网网络 (Private & LAN) ---
   private: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs", path: "./ruleset/private.mrs" }
   private_ip: { <<: *rule_providers_ip, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs", path: "./ruleset/private_ip.mrs" }
-
-  # --- 人工智能 (AI Services) ---
   ai: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.mrs", path: "./ruleset/ai.mrs" }
-
-  # --- 谷歌服务 (Google & YouTube) ---
   google: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs", path: "./ruleset/google.mrs" }
   google_ip: { <<: *rule_providers_ip, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs", path: "./ruleset/google_ip.mrs" }
   youtube: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/youtube.mrs", path: "./ruleset/youtube.mrs" }
-
-  # --- 流媒体与海外主流 (Media & Global) ---
   tiktok: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs", path: "./ruleset/tiktok.mrs" }
   netflix: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs", path: "./ruleset/netflix.mrs" }
   spotify: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/spotify.mrs", path: "./ruleset/spotify.mrs" }
   bahamut: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bahamut.mrs", path: "./ruleset/bahamut.mrs" }
   niconico: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/niconico.mrs", path: "./ruleset/niconico.mrs" }
   gfw: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs", path: "./ruleset/gfw.mrs" }
-
-  # --- 国内直连与补充 (China Direct) ---
   bilibili: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bilibili.mrs", path: "./ruleset/bilibili.mrs" }
   cn: { <<: *rule_providers_domain, format: mrs, url: "https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs", path: "./ruleset/cn.mrs" }
   cn_additional: { <<: *rule_providers_domain, format: mrs, url: "https://static-file-global.353355.xyz/rules/cn-additional-list.mrs", path: "./ruleset/cn-additional-list.mrs" }
   cn_ip: { <<: *rule_providers_ip, format: mrs, url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs", path: "./ruleset/cn_ip.mrs" }
-
-  # --- 应用下载与大文件 (Downloads) ---
   DownloadApps: { <<: *rule_providers_classical, format: yaml, url: "https://fastly.jsdelivr.net/gh/AIsouler/MyClash@main/Rules/DownloadApps.txt", path: "./ruleset/DownloadApps.txt" }
+  
 profile:
   store-selected: true
   store-fake-ip: true
@@ -124,6 +114,7 @@ sniffer:
     - "rule-set:DownloadApps"
 
   force-domain: []
+
 # ==================== 🌐 国内外 DNS 统一锚点定义 ====================
 chinaDNS:
   &chinaDNS [
@@ -152,25 +143,20 @@ dns:
     - "+.lan"
     - "+.local"
     - "+.market.xiaomi.com"
-    - "rule-set:private"           # 完美继承你的私有网络不走 fake-ip 逻辑
-
-  # 兜底解析服务器（仅用于解析 DoH 域名本身，若 hosts 已死会用到）
+    - "rule-set:private"     
+          
   default-nameserver:
     - '223.5.5.5'
     - '119.29.29.29'
 
-  # 代理服务器域名解析（由国内直连 DNS 快速响应，防止去国外绕一圈）
   proxy-server-nameserver: *chinaDNS
 
-  # 直连解析服务器（非 fake-ip 请求或某些特殊直连连接使用）
   direct-nameserver:
-    - 'system'                     # 优先使用本地网络下发的 DNS 解析局域网
+    - 'system'                     
     - '223.5.5.5'
 
-  # 默认 Fake-IP 映射池解析源（指定走【默认】策略组，走国外代理防止被墙污染）
   nameserver: *foreignDNS
 
-  # 策略路由：指定特定域名或规则集使用对应的 DNS 服务器
   nameserver-policy:
     'rule-set:private': ['system']       
     'rule-set:cn': *chinaDNS               
@@ -205,7 +191,7 @@ proxy-groups:
   # ==================== 核心组 ====================
   - name: 默认
     type: select
-    proxies: [直连, 香港, 台湾, 日本, 韩国, 新加坡, 美国, 其他地区, 解锁节点]
+    proxies: [解锁节点, 直连, 香港, 台湾, 日本, 韩国, 新加坡, 美国, 其他地区]
     icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png"
     
   - name: 直连
@@ -227,25 +213,24 @@ proxy-groups:
   - {name: 其他, <<: *pr, icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Final.png"}
 
   # ==================== 后台测速组 ====================
-  - {name: "香港-自动选择", <<: *ut, use: [P1, P2], filter: *fhk}
-  - {name: "台湾-自动选择", <<: *ut, use: [P2], filter: *ftw}
-  - {name: "日本-自动选择", <<: *ut, use: [P1], filter: *fjp}
-  - {name: "韩国-自动选择", <<: *ut, use: [P1, P2], filter: *fkr}
-  - {name: "新加坡-自动选择", <<: *ut, use: [P1, P2], filter: *fsg}
-  - {name: "美国-自动选择", <<: *ut, use: [P1, P2], filter: *fus}
-  - {name: "其他地区-自动选择", <<: *ut, use: [P1, P2], filter: *fot}
-  - {name: "解锁节点-自动选择", <<: *ut, use: [P2], filter: *fjs}
+  - {name: "解锁节点-自动选择", <<: *ut, include-all: true, filter: *fjs}
+  - {name: "香港-自动选择", <<: *ut, include-all: true, filter: *fhk}
+  - {name: "台湾-自动选择", <<: *ut, nclude-all: true, filter: *ftw}
+  - {name: "日本-自动选择", <<: *ut, nclude-all: true, filter: *fjp}
+  - {name: "韩国-自动选择", <<: *ut, include-all: true, filter: *fkr}
+  - {name: "新加坡-自动选择", <<: *ut, include-all: true, filter: *fsg}
+  - {name: "美国-自动选择", <<: *ut, include-all: true, filter: *fus}
+  - {name: "其他地区-自动选择", <<: *ut, include-all: true, filter: *fot}
 
   # ==================== 地区显式选择组 ====================
-  - {name: 香港, type: select, use: [P1, P2], filter: *fhk, proxies: ["香港-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"}
-  - {name: 台湾, type: select, use: [P1, P2], filter: *ftw, proxies: ["台湾-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"}
-  - {name: 日本, type: select, use: [P1, P2], filter: *fjp, proxies: ["日本-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"}
-  - {name: 韩国, type: select, use: [P1, P2], filter: *fkr, proxies: ["韩国-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"}
-  - {name: 新加坡, type: select, use: [P1, P2], filter: *fsg, proxies: ["新加坡-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"}
-  - {name: 美国, type: select, use: [P1, P2], filter: *fus, proxies: ["美国-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"}
-  - {name: 其他地区, type: select, use: [P1, P2], filter: *fot, proxies: ["其他地区-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png"}
-  - {name: 解锁节点, type: select, use: [P1, P2], filter: *fjs, proxies: ["解锁节点-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png"}
-
+  - {name: 解锁节点, type: select, include-all: true, filter: *fjs, proxies: ["解锁节点-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png"}
+  - {name: 香港, type: select, include-all: true, filter: *fhk, proxies: ["香港-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png"}
+  - {name: 台湾, type: select, include-all: true, filter: *ftw, proxies: ["台湾-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png"}
+  - {name: 日本, type: select, include-all: true, filter: *fjp, proxies: ["日本-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png"}
+  - {name: 韩国, type: select, include-all: true, filter: *fkr, proxies: ["韩国-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png"}
+  - {name: 新加坡, type: select, include-all: true, filter: *fsg, proxies: ["新加坡-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png"}
+  - {name: 美国, type: select, include-all: true, filter: *fus, proxies: ["美国-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png"}
+  - {name: 其他地区, type: select, include-all: true, filter: *fot, proxies: ["其他地区-自动选择"], icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png"}
 
 # --- 精简优化的路由规则 ---
 rules:
