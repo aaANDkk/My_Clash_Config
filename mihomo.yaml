@@ -214,8 +214,8 @@ proxy-groups:
   # ==================== 后台测速组 ====================
   - {name: "解锁节点-自动选择", <<: *ut, include-all: true, filter: *fjs}
   - {name: "香港-自动选择", <<: *ut, include-all: true, filter: *fhk}
-  - {name: "台湾-自动选择", <<: *ut, nclude-all: true, filter: *ftw}
-  - {name: "日本-自动选择", <<: *ut, nclude-all: true, filter: *fjp}
+  - {name: "台湾-自动选择", <<: *ut, include-all: true, filter: *ftw}
+  - {name: "日本-自动选择", <<: *ut, include-all: true, filter: *fjp}
   - {name: "韩国-自动选择", <<: *ut, include-all: true, filter: *fkr}
   - {name: "新加坡-自动选择", <<: *ut, include-all: true, filter: *fsg}
   - {name: "美国-自动选择", <<: *ut, include-all: true, filter: *fus}
